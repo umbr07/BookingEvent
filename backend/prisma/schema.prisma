@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model bookings {
+  id         Int      @id @default(autoincrement())
+  event_id   Int
+  user_id    Int
+  created_at DateTime @default(now())
+  events     events   @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([event_id, user_id])
+  @@index([user_id], map: "bookings_user_id_fkey")
+}
+
+model events {
+  id          Int        @id @default(autoincrement())
+  name        String
+  total_seats Int 
+  bookings    bookings[]
+}
+
+model user {
+  id       Int        @id @default(autoincrement())
+  name     String
+  bookings bookings[]
+}
